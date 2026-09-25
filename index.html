@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<title>Waqar Trader · Developer</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+  :root{--bg:#0b1220;--card:#121a2b;--elev:#1a2438;--line:rgba(148,163,184,.14);--text:#e8eef7;--muted:#8b9bb4;--a:#22d3ee;--a2:#67e8f9;--gold:#f0b429;--ok:#34d399;--bad:#f87171}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100dvh}
+  .sc{display:none}.sc.on{display:block}
+  .card{background:linear-gradient(165deg,rgba(26,36,56,.95),rgba(18,26,43,.98));border:1px solid var(--line);border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,.3)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;border-radius:12px;font-weight:800;font-size:12px;padding:11px 16px;cursor:pointer}
+  .btn:active{transform:scale(.97)}
+  .btn-pri{background:linear-gradient(135deg,#22d3ee,#0891b2);color:#042f2e}
+  .btn-gold{background:linear-gradient(135deg,#f0b429,#d97706);color:#1a1204}
+  .btn-ghost{background:rgba(255,255,255,.05);color:#cbd5e1;border:1px solid var(--line)}
+  .btn-bad{background:rgba(248,113,113,.12);color:#f87171;border:1px solid rgba(248,113,113,.3)}
+  .btn-sm{padding:7px 11px;font-size:11px;border-radius:9px}
+  .stat{padding:14px;border-radius:14px;background:linear-gradient(145deg,#151e30,#0f1624);border:1px solid var(--line)}
+  .stat .l{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  .stat .v{font-size:20px;font-weight:900;margin-top:4px}
+  .navb{flex:1;text-align:center;padding:8px 2px;color:#4b5568;font-size:9px;font-weight:800}
+  .navb.on{color:var(--a2)}.navb i{display:block;font-size:16px;margin-bottom:3px}
+  .row{border-radius:12px;border:1px solid var(--line);background:var(--elev);padding:12px;margin-bottom:8px}
+  .chip{display:inline-block;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:800}
+  .toast{position:fixed;bottom:76px;left:50%;transform:translateX(-50%);z-index:200;padding:10px 18px;border-radius:999px;font-size:12px;font-weight:800;display:none;background:#164e63;border:1px solid #22d3ee;color:#ecfeff;max-width:90%}
+  .toast.on{display:block}
+  .field{background:var(--elev);border:1px solid rgba(148,163,184,.18);border-radius:12px;padding:10px 12px}
+  .field label{display:block;font-size:10px;font-weight:800;color:var(--muted);margin-bottom:4px;text-transform:uppercase}
+  .field input,.field textarea,.field select{width:100%;background:transparent;border:none;outline:none;color:var(--text);font-size:14px;font-weight:600}
+  .avatar-frame{width:56px;height:56px;border-radius:16px;overflow:hidden;border:2px solid #22d3ee;box-shadow:0 0 16px rgba(34,211,238,.35);background:#0f172a;flex-shrink:0}
+  .avatar-frame img{width:100%;height:100%;object-fit:cover}
+  .msg-bubble{max-width:85%;padding:10px 12px;border-radius:14px;font-size:13px;line-height:1.45;margin-bottom:8px}
+  .msg-me{background:linear-gradient(135deg,#164e63,#0e7490);color:#ecfeff;margin-left:auto;border-bottom-right-radius:4px}
+  .msg-them{background:var(--elev);border:1px solid var(--line);margin-right:auto;border-bottom-left-radius:4px}
+  .msg-img{max-width:100%;border-radius:10px;margin-top:6px;display:block}
+  #chat-scroll{overflow-y:auto;flex:1;padding:12px;min-height:0}
+  .modal{position:fixed;inset:0;z-index:250;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;padding:12px}
+  .modal.on{display:flex}
+  .mbox{width:100%;max-width:440px;max-height:90dvh;overflow:auto;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+  .tb{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+  .tb button{padding:6px 10px;border-radius:8px;border:1px solid var(--line);background:var(--elev);color:var(--text);font-size:11px;font-weight:700;cursor:pointer}
+  .tb button.on{border-color:#22d3ee;color:#22d3ee}
+  #log-body{min-height:120px;background:var(--elev);border:1px solid var(--line);border-radius:12px;padding:12px;outline:none;font-size:14px;line-height:1.5}
+  .rpt-item{display:flex;align-items:center;justify-content:space-between;padding:14px 12px;border-radius:12px;border:1px solid var(--line);background:var(--elev);margin-bottom:8px;cursor:pointer}
+  .rpt-item:active{opacity:.85}
+</style>
+</head>
+<body>
+<div id="toast" class="toast"></div>
+
+<div id="sc-app" style="padding-bottom:72px;min-height:100dvh">
+  <header style="position:sticky;top:0;z-index:40;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;background:rgba(11,18,32,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="avatar-frame" id="dev-avatar-hdr"><img id="dev-avatar-img" src="https://ui-avatars.com/api/?name=Dev&background=0891b2&color=fff&size=112" alt="Dev"></div>
+      <div>
+        <div style="font-weight:900;font-size:15px">Developer Panel</div>
+        <div style="font-size:10px;color:var(--muted)"><span id="hdr-dev-name">Developer</span> · Waqar Trader · <span id="conn" style="color:var(--ok)">Online</span></div>
+      </div>
+    </div>
+  </header>
+
+  <main style="padding:14px;max-width:720px;margin:0 auto;width:100%">
+    <section id="pg-home" class="sc on">
+      <div style="font-weight:900;font-size:16px;margin-bottom:12px">Overview</div>
+      <div id="stats" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px"></div>
+      <div class="card" style="padding:14px;margin-bottom:12px">
+        <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--a2);margin-bottom:10px">Quick flags</div>
+        <div id="flags" style="font-size:13px"></div>
+      </div>
+      <div class="card" style="padding:14px">
+        <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:10px">Open support chats</div>
+        <div id="open-chats" style="font-size:13px"></div>
+      </div>
+    </section>
+
+    <section id="pg-sales" class="sc">
+      <div style="font-weight:900;font-size:16px;margin-bottom:12px">Sales / Vouchers</div>
+      <div class="field" style="margin-bottom:10px"><input id="sq" placeholder="Search bill / customer"></div>
+      <div id="slist"></div>
+    </section>
+
+    <section id="pg-prod" class="sc">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <button id="prod-back" class="btn btn-ghost btn-sm" style="display:none"><i class="fa-solid fa-arrow-left"></i></button>
+        <div style="font-weight:900;font-size:16px" id="prod-title">Categories</div>
+      </div>
+      <div class="field" style="margin-bottom:10px"><input id="pq" placeholder="Search name / code"></div>
+      <div id="plist"></div>
+    </section>
+
+    <section id="pg-staff" class="sc">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="font-weight:900;font-size:16px">Cashiers</div>
+      </div>
+      <div id="ulist"></div>
+    </section>
+
+    <section id="pg-reports" class="sc">
+      <div style="font-weight:900;font-size:16px;margin-bottom:12px">Reports</div>
+      <div id="rpt-menu">
+        <div class="rpt-item" data-rtype="daily"><div><b>Daily Report</b><div style="font-size:11px;color:var(--muted);margin-top:2px">Sales for one day</div></div><i class="fa-solid fa-chevron-right" style="color:var(--muted)"></i></div>
+        <div class="rpt-item" data-rtype="monthly"><div><b>Monthly Report</b><div style="font-size:11px;color:var(--muted);margin-top:2px">Full month sales</div></div><i class="fa-solid fa-chevron-right" style="color:var(--muted)"></i></div>
+        <div class="rpt-item" data-rtype="purchase"><div><b>Purchasing Report</b><div style="font-size:11px;color:var(--muted);margin-top:2px">Purchase bills by date</div></div><i class="fa-solid fa-chevron-right" style="color:var(--muted)"></i></div>
+        <div class="rpt-item" data-rtype="cashiers"><div><b>Cashier Report</b><div style="font-size:11px;color:var(--muted);margin-top:2px">Performance by cashier</div></div><i class="fa-solid fa-chevron-right" style="color:var(--muted)"></i></div>
+      </div>
+      <div id="rpt-run" style="display:none">
+        <button type="button" id="rpt-back" class="btn btn-ghost btn-sm" style="margin-bottom:10px"><i class="fa-solid fa-arrow-left"></i> Back</button>
+        <div class="card" style="padding:14px;margin-bottom:12px">
+          <div style="font-weight:800;margin-bottom:10px" id="rpt-run-title">Report</div>
+          <div id="rpt-fields"></div>
+          <button type="button" id="rpt-go" class="btn btn-pri" style="width:100%;margin-top:12px">Generate & Print</button>
+        </div>
+        <div id="rpt-preview" class="card" style="padding:14px;display:none"></div>
+      </div>
+    </section>
+
+    <section id="pg-logs" class="sc">
+      <div style="font-weight:900;font-size:16px;margin-bottom:12px">Change Logs</div>
+      <div class="card" style="padding:14px;margin-bottom:14px">
+        <div class="field" style="margin-bottom:10px"><label>Title</label><input id="log-title" placeholder="Update title" style="font-weight:900"></div>
+        <div class="tb">
+          <button type="button" data-cmd="bold"><b>B</b></button>
+          <button type="button" data-cmd="underline"><u>U</u></button>
+          <button type="button" data-cmd="italic"><i>I</i></button>
+          <button type="button" data-cmd="insertUnorderedList">• List</button>
+          <button type="button" data-cmd="insertOrderedList">1. List</button>
+          <button type="button" data-fore="#22d3ee" style="color:#22d3ee">A</button>
+          <button type="button" data-fore="#f0b429" style="color:#f0b429">A</button>
+          <button type="button" data-fore="#f87171" style="color:#f87171">A</button>
+          <button type="button" data-fore="#34d399" style="color:#34d399">A</button>
+          <button type="button" data-fore="#e8eef7" style="color:#e8eef7">A</button>
+        </div>
+        <div id="log-body" contenteditable="true" data-placeholder="Write changelog…"></div>
+        <button type="button" id="log-send" class="btn btn-pri" style="width:100%;margin-top:12px">Send to Users</button>
+      </div>
+      <div style="font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Published (new on top)</div>
+      <div id="log-list"></div>
+    </section>
+
+    <section id="pg-chat" class="sc">
+      <div id="chat-list-view">
+        <div style="font-weight:900;font-size:16px;margin-bottom:12px">Support Chats</div>
+        <div id="chatlist"></div>
+      </div>
+      <div id="chat-room-view" style="display:none;flex-direction:column;height:calc(100dvh - 130px)">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--line)">
+          <button id="chat-back" class="btn btn-ghost btn-sm"><i class="fa-solid fa-arrow-left"></i></button>
+          <div class="avatar-frame" style="width:40px;height:40px;border-radius:12px"><img id="chat-peer-img" src="" alt=""></div>
+          <div style="flex:1;min-width:0">
+            <div id="chat-peer-name" style="font-weight:800;font-size:14px">User</div>
+            <div id="chat-peer-meta" style="font-size:10px;color:var(--muted)">—</div>
+          </div>
+          <button id="chat-end" class="btn btn-bad btn-sm">End</button>
+          <button id="chat-del" class="btn btn-ghost btn-sm" style="color:var(--bad)"><i class="fa-solid fa-trash"></i></button>
+        </div>
+        <div id="chat-scroll"></div>
+        <div style="display:flex;gap:8px;padding-top:10px;border-top:1px solid var(--line)">
+          <label class="btn btn-ghost btn-sm" style="cursor:pointer;padding:10px"><i class="fa-solid fa-image"></i><input type="file" id="chat-img" accept="image/*" style="display:none"></label>
+          <input id="chat-input" placeholder="Type reply…" style="flex:1;background:var(--elev);border:1px solid var(--line);border-radius:12px;padding:10px 12px;color:var(--text);outline:none">
+          <button id="chat-send" class="btn btn-pri btn-sm"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+      </div>
+    </section>
+
+    <section id="pg-set" class="sc">
+      <div style="font-weight:900;font-size:16px;margin-bottom:12px">Developer Identities</div>
+      <div class="card" style="padding:14px;margin-bottom:12px">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Chat pe user message pe identity select / naya name + DP</div>
+        <div id="id-list"></div>
+        <button type="button" id="id-new" class="btn btn-ghost" style="width:100%;margin-top:10px"><i class="fa-solid fa-plus"></i> New identity</button>
+      </div>
+    </section>
+  </main>
+
+  <nav style="position:fixed;bottom:0;left:0;right:0;display:flex;background:rgba(11,18,32,.96);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:40;backdrop-filter:blur(12px)">
+    <button class="navb on" data-p="home"><i class="fa-solid fa-gauge-high"></i>Home</button>
+    <button class="navb" data-p="sales"><i class="fa-solid fa-receipt"></i>Sales</button>
+    <button class="navb" data-p="prod"><i class="fa-solid fa-box"></i>Stock</button>
+    <button class="navb" data-p="staff"><i class="fa-solid fa-key"></i>Cashiers</button>
+    <button class="navb" data-p="reports"><i class="fa-solid fa-chart-pie"></i>Reports</button>
+    <button class="navb" data-p="logs"><i class="fa-solid fa-scroll"></i>Logs</button>
+    <button class="navb" data-p="chat"><i class="fa-solid fa-comments"></i>Chat</button>
+    <button class="navb" data-p="set"><i class="fa-solid fa-user-gear"></i>IDs</button>
+  </nav>
+</div>
+
+<!-- VOUCHER VIEW -->
+<div id="md-bill" class="modal"><div class="mbox">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <div style="font-weight:900;font-size:16px">Voucher <span id="vb-no" style="color:var(--a2)"></span></div>
+    <button type="button" id="vb-close" class="btn btn-ghost btn-sm">Close</button>
+  </div>
+  <div id="vb-body" style="font-size:13px"></div>
+</div></div>
+
+<!-- IDENTITY PICKER -->
+<div id="md-id" class="modal"><div class="mbox">
+  <div style="font-weight:900;font-size:16px;margin-bottom:12px">Who is replying?</div>
+  <div id="id-pick-list" style="margin-bottom:12px"></div>
+  <div class="field" style="margin-bottom:8px"><label>Your name</label><input id="id-name" placeholder="Name"></div>
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+    <div class="avatar-frame" style="width:48px;height:48px"><img id="id-prev" src="https://ui-avatars.com/api/?name=Dev&background=0891b2&color=fff&size=96"></div>
+    <label class="btn btn-ghost btn-sm" style="cursor:pointer;flex:1"><i class="fa-solid fa-image"></i> Upload DP<input type="file" id="id-file" accept="image/*" style="display:none"></label>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button type="button" id="id-save" class="btn btn-pri" style="flex:1">Save & Open Chat</button>
+    <button type="button" id="id-cancel" class="btn btn-ghost" style="flex:1">Cancel</button>
+  </div>
+</div></div>
+
+<!-- STAFF EDIT -->
+<div id="md-u" class="modal"><div class="mbox">
+  <div style="font-weight:900;font-size:16px;margin-bottom:12px">Edit Cashier</div>
+  <div class="field" style="margin-bottom:8px"><label>Name</label><input id="eu-name"></div>
+  <div class="field" style="margin-bottom:8px"><label>Username</label><input id="eu-user"></div>
+  <div class="field" style="margin-bottom:8px"><label>Password</label><input id="eu-pass"></div>
+  <div class="field" style="margin-bottom:8px"><label>Discount %</label><input id="eu-disc" type="number"></div>
+  <label style="display:flex;gap:8px;align-items:center;font-size:12px;margin-bottom:12px"><input id="eu-act" type="checkbox" checked> Active</label>
+  <div style="display:flex;gap:8px">
+    <button type="button" id="eu-save" class="btn btn-pri" style="flex:1">Save</button>
+    <button type="button" id="eu-close" class="btn btn-ghost" style="flex:1">Close</button>
+  </div>
+</div></div>
+
+<div id="print-root" style="display:none"></div>
+
+<script>
+(function(){
+"use strict";
+firebase.initializeApp({
+  apiKey:"AIzaSyCdoyMdeNfQnrMjpZdX-1lSTL7nHP1UBr0",
+  authDomain:"waqar-trader.firebaseapp.com",
+  databaseURL:"https://waqar-trader-default-rtdb.firebaseio.com",
+  projectId:"waqar-trader",
+  storageBucket:"waqar-trader.firebasestorage.app",
+  messagingSenderId:"1014019143422",
+  appId:"1:1014019143422:android:81752d55cf1e96a790d7af"
+});
+const db=firebase.database();
+let products={},customers={},users={},bills={},purchases={},chats={},identities={},changelogs={};
+let activeChatId=null, pendingChatId=null, activeIdentity=null, editUserId=null;
+let prodCategory=null;
+let currentIdentity={name:"Developer",avatar:""};
+
+try{const s=JSON.parse(localStorage.getItem("wt_dev_identity")||"null");if(s&&s.name)currentIdentity=s}catch(e){}
+
+const money=n=>(Number(n)||0).toFixed(2);
+const today=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("on");setTimeout(()=>t.classList.remove("on"),2400)}
+function escapeHtml(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+
+db.ref(".info/connected").on("value",s=>{
+  document.getElementById("conn").textContent=s.val()?"Online":"Offline";
+  document.getElementById("conn").style.color=s.val()?"var(--ok)":"var(--bad)";
+});
+
+function applyHdr(){
+  document.getElementById("hdr-dev-name").textContent=currentIdentity.name||"Developer";
+  const url=currentIdentity.avatar||("https://ui-avatars.com/api/?name="+encodeURIComponent(currentIdentity.name||"Dev")+"&background=0891b2&color=fff&size=112");
+  document.getElementById("dev-avatar-img").src=url;
+}
+applyHdr();
+
+function go(p){
+  document.querySelectorAll(".sc").forEach(x=>x.classList.remove("on"));
+  document.getElementById("pg-"+p).classList.add("on");
+  document.querySelectorAll(".navb").forEach(b=>b.classList.toggle("on",b.getAttribute("data-p")===p));
+  if(p==="home")renderHome();
+  if(p==="sales")renderSales();
+  if(p==="prod"){prodCategory=null;renderProd()}
+  if(p==="staff")renderStaff();
+  if(p==="reports"){document.getElementById("rpt-menu").style.display="block";document.getElementById("rpt-run").style.display="none"}
+  if(p==="logs")renderLogList();
+  if(p==="chat"){showChatList();renderChatList()}
+  if(p==="set")renderIdentities();
+}
+document.querySelectorAll(".navb").forEach(b=>b.onclick=()=>go(b.getAttribute("data-p")));
+
+function snapToMap(snap){
+  const m={};
+  const raw=snap&&snap.val?snap.val():null;
+  if(!raw||typeof raw!=="object") return m;
+  Object.keys(raw).forEach(k=>{
+    const v=raw[k];
+    if(v!=null&&typeof v==="object") m[k]=Object.assign({id:k},v);
+  });
+  return m;
+}
+function activePage(){
+  const el=document.querySelector(".sc.on");
+  if(!el||!el.id) return "";
+  return el.id.replace(/^pg-/,"");
+}
+function refreshActive(){
+  const p=activePage();
+  if(p==="home") renderHome();
+  else if(p==="sales") renderSales();
+  else if(p==="prod") renderProd();
+  else if(p==="staff") renderStaff();
+  else if(p==="chat"){ if(activeChatId) renderChatRoom(); else renderChatList(); }
+  else if(p==="logs") renderLogList();
+  else if(p==="set") renderIdentities();
+  else if(p==="reports") { /* keep current report view */ }
+}
+
+function bindLive(path, assign, after){
+  const ref=db.ref(path);
+  const apply=snap=>{
+    try{
+      assign(snapToMap(snap));
+      if(after) after();
+      refreshActive();
+    }catch(e){ console.error(path,e); }
+  };
+  ref.once("value").then(apply).catch(e=>{console.error(path+" once",e);toast(path+" load failed")});
+  ref.on("value", apply, e=>{console.error(path+" live",e);toast(path+" sync error")});
+}
+
+bindLive("products", m=>{ products=m; });
+bindLive("customers", m=>{ customers=m; });
+bindLive("users", m=>{ users=m; });
+bindLive("bills", m=>{
+  // normalize dates
+  Object.keys(m).forEach(k=>{
+    const v=m[k];
+    if(!v.date && v.ts){
+      try{const d=new Date(v.ts);v.date=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}catch(e){}
+    }
+  });
+  bills=m;
+});
+bindLive("purchases", m=>{ purchases=m; });
+bindLive("support_chats", m=>{ chats=m; });
+bindLive("dev_identities", m=>{ identities=m; });
+bindLive("changelogs", m=>{ changelogs=m; });
+
+function billDate(b){if(b.date)return String(b.date).slice(0,10);if(b.ts){try{const d=new Date(b.ts);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}catch(e){}}return""}
+
+function renderHome(){
+  const tk=today();
+  let todaySale=0,todayBills=0,openChats=0;
+  Object.values(bills).forEach(b=>{if(b.cancelled)return;if(billDate(b)===tk){todaySale+=Number(b.grandTotal||0);todayBills++}});
+  openChats=Object.values(chats).filter(c=>c.status==="open").length;
+  document.getElementById("stats").innerHTML=[
+    ["Products",Object.keys(products).length,"#22d3ee"],
+    ["Cashiers",Object.keys(users).length,"#a78bfa"],
+    ["Today sale",money(todaySale),"#f0b429"],
+    ["Open chats",openChats,"#34d399"]
+  ].map(([l,v,c])=>`<div class="stat"><div class="l">${l}</div><div class="v" style="color:${c}">${v}</div></div>`).join("");
+  const flags=[];
+  if(openChats)flags.push(`<div class="row">${openChats} open support chat(s)</div>`);
+  if(!Object.keys(products).length)flags.push('<div class="row">No products yet</div>');
+  document.getElementById("flags").innerHTML=flags.join("")||'<div style="color:var(--muted)">No flags</div>';
+  const open=Object.values(chats).filter(c=>c.status==="open").sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+  document.getElementById("open-chats").innerHTML=open.length?open.slice(0,5).map(c=>`<div class="row" style="cursor:pointer" data-oc="${c.id}"><div style="font-weight:800">${c.userName||"Cashier"} · <span class="chip" style="background:rgba(34,211,238,.15);color:#22d3ee">${c.issueType||"issue"}</span></div><div style="font-size:11px;color:var(--muted);margin-top:4px">${(c.lastMessage||"").slice(0,60)}</div></div>`).join(""):'<span style="color:var(--muted)">No open chats</span>';
+  document.querySelectorAll("[data-oc]").forEach(el=>el.onclick=()=>{go("chat");requestOpenChat(el.getAttribute("data-oc"))});
+}
+
+function renderSales(){
+  let rows=Object.values(bills).sort((a,b)=>Number(b.ts||0)-Number(a.ts||0));
+  const q=(document.getElementById("sq").value||"").toLowerCase().trim();
+  if(q)rows=rows.filter(b=>[b.billNo,b.customerName,b.cashierName,b.paymentMethod].map(x=>String(x||"").toLowerCase()).join(" ").includes(q));
+  const active=rows.filter(b=>!b.cancelled);
+  const sum=active.reduce((n,b)=>n+Number(b.grandTotal||0),0);
+  document.getElementById("slist").innerHTML=`<div class="row" style="background:rgba(34,211,238,.08);border-color:rgba(34,211,238,.25)"><div style="display:flex;justify-content:space-between"><span><b style="color:var(--a2);font-size:16px">${rows.length}</b> vouchers</span><span style="color:var(--gold);font-weight:900">${money(sum)}</span></div></div>`+
+    (rows.map(b=>`<div class="row"${b.cancelled?' style="opacity:.5"':""}><div style="display:flex;justify-content:space-between;align-items:center"><div><b style="color:var(--a2)">${b.billNo||"—"}</b><div style="font-size:11px;color:var(--muted);margin-top:4px">${b.customerName||"—"} · ${b.cashierName||"—"} · ${b.ts?new Date(b.ts).toLocaleString():billDate(b)}</div></div><div style="text-align:right"><b style="color:var(--gold)">${money(b.grandTotal)}</b><div style="margin-top:6px"><button type="button" class="btn btn-ghost btn-sm" data-view="${b.id}">View</button></div></div></div></div>`).join("")||'<div style="color:var(--muted);text-align:center;padding:24px">No bills</div>');
+  document.querySelectorAll("[data-view]").forEach(btn=>btn.onclick=()=>viewBill(btn.getAttribute("data-view")));
+}
+document.getElementById("sq").oninput=renderSales;
+
+function viewBill(id){
+  const b=bills[id];if(!b)return;
+  document.getElementById("vb-no").textContent=b.billNo||"";
+  const items=(b.items||[]).map((it,i)=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line)"><span>${i+1}. ${escapeHtml(it.name)} ×${it.qty}</span><span>${money(it.amount||it.rate*it.qty)}</span></div>`).join("");
+  document.getElementById("vb-body").innerHTML=`
+    <div style="margin-bottom:8px;color:var(--muted);font-size:12px">${b.ts?new Date(b.ts).toLocaleString():billDate(b)}</div>
+    <div><b>Customer:</b> ${escapeHtml(b.customerName||"—")}</div>
+    <div><b>Cashier:</b> ${escapeHtml(b.cashierName||"—")}</div>
+    <div><b>Pay:</b> ${escapeHtml(b.paymentMethod||"cash")} · Paid ${money(b.paid)} · Bal ${money(b.balance)}</div>
+    <div style="margin:12px 0 6px;font-weight:800;color:var(--a2)">Items</div>${items||"—"}
+    <div style="margin-top:12px;display:flex;justify-content:space-between;font-weight:900"><span>Total</span><span style="color:var(--gold)">${money(b.grandTotal)}</span></div>
+    ${b.cancelled?'<div style="margin-top:8px" class="chip" style="background:rgba(248,113,113,.2);color:#f87171">CANCELLED</div>':""}`;
+  document.getElementById("md-bill").classList.add("on");
+}
+document.getElementById("vb-close").onclick=()=>document.getElementById("md-bill").classList.remove("on");
+
+function renderProd(){
+  const q=(document.getElementById("pq").value||"").toLowerCase().trim();
+  const all=Object.values(products);
+  document.getElementById("prod-back").style.display=(prodCategory||prodCategory==="__ALL__")?"inline-flex":"none";
+  if(!prodCategory){
+    document.getElementById("prod-title").textContent="Categories · "+all.length+" products";
+    const cats={};
+    all.forEach(p=>{const c=((p.category||"UNCATEGORIZED")+"").trim().toUpperCase()||"UNCATEGORIZED";if(!cats[c])cats[c]=0;cats[c]++});
+    let keys=Object.keys(cats).sort();
+    if(q){
+      // search across products -> show matching products list
+      let list=all.filter(p=>(p.name||"").toLowerCase().includes(q)||(p.code||"").toLowerCase().includes(q)||(p.category||"").toLowerCase().includes(q));
+      document.getElementById("plist").innerHTML=`<div class="row" style="background:rgba(34,211,238,.08)"><b style="color:var(--a2)">Search: ${list.length} found</b></div>`+
+        (list.map(p=>`<div class="row"><div style="font-weight:800">${escapeHtml(p.name||"")}</div><div style="font-size:11px;color:var(--muted)">${escapeHtml(p.category||"")} · ${escapeHtml(p.code||"—")} · Sale <b style="color:var(--gold)">${money(p.salePrice)}</b></div></div>`).join("")||'<div style="color:var(--muted);text-align:center;padding:24px">No match</div>');
+      return;
+    }
+    let html=`<div class="row" style="cursor:pointer;border-color:rgba(34,211,238,.35)" data-cat="__ALL__"><div style="display:flex;justify-content:space-between"><b style="color:var(--a2)">ALL PRODUCTS</b><span style="color:var(--a2);font-weight:800">${all.length}</span></div></div>`;
+    html+=keys.length?keys.map(c=>`<div class="row" style="cursor:pointer" data-cat="${escapeHtml(c)}"><div style="display:flex;justify-content:space-between"><b>${escapeHtml(c)}</b><span style="color:var(--a2);font-weight:800">${cats[c]} items</span></div></div>`).join(""):'<div style="color:var(--muted);text-align:center;padding:24px">No products in Firebase — Admin se Import TXT karein</div>';
+    document.getElementById("plist").innerHTML=html;
+    document.querySelectorAll("[data-cat]").forEach(el=>el.onclick=()=>{prodCategory=el.getAttribute("data-cat");renderProd()});
+    return;
+  }
+  document.getElementById("prod-title").textContent=prodCategory==="__ALL__"?"All Products":prodCategory;
+  let list=prodCategory==="__ALL__"?all.slice():all.filter(p=>((p.category||"UNCATEGORIZED")+"").trim().toUpperCase()===prodCategory);
+  if(q)list=list.filter(p=>(p.name||"").toLowerCase().includes(q)||(p.code||"").toLowerCase().includes(q));
+  list.sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+  document.getElementById("plist").innerHTML=`<div class="row" style="background:rgba(34,211,238,.08)"><b style="color:var(--a2)">${list.length} products</b></div>`+
+    (list.map(p=>`<div class="row"><div style="font-weight:800">${escapeHtml(p.name||"")}</div><div style="font-size:11px;color:var(--muted)">${escapeHtml(p.category||"")} · ${escapeHtml(p.code||"—")} · Sale <b style="color:var(--gold)">${money(p.salePrice)}</b> · ${escapeHtml(p.unit||"PCS")}</div></div>`).join("")||'<div style="color:var(--muted);text-align:center;padding:24px">No products</div>');
+}
+document.getElementById("pq").oninput=renderProd;
+document.getElementById("prod-back").onclick=()=>{prodCategory=null;document.getElementById("pq").value="";renderProd()};
+
+function renderStaff(){
+  const list=Object.values(users).sort((a,b)=>(a.name||a.username||"").localeCompare(b.name||b.username||""));
+  document.getElementById("ulist").innerHTML=`<div class="row" style="background:rgba(34,211,238,.08)"><b style="color:var(--a2)">Total cashiers: ${list.length}</b></div>`+
+    (list.map(u=>`<div class="row"><div style="display:flex;justify-content:space-between;gap:8px"><div><div style="font-weight:800">${escapeHtml(u.name||u.username||"—")} ${u.active===false?'<span class="chip" style="background:rgba(248,113,113,.2);color:#f87171">OFF</span>':'<span class="chip" style="background:rgba(52,211,153,.15);color:#34d399">ON</span>'}</div><div style="font-size:12px;margin-top:6px;font-family:monospace;background:rgba(0,0,0,.25);padding:8px;border-radius:8px">User: <b style="color:var(--a2)">${escapeHtml(u.username||"—")}</b><br>Pass: <b style="color:var(--gold)">${u.password!=null&&u.password!==""?escapeHtml(String(u.password)):"—"}</b><br><span style="color:var(--muted);font-size:11px">Disc ${u.discountLimit??5}%</span></div></div><button type="button" class="btn btn-ghost btn-sm" data-ue="${u.id}">Edit</button></div></div>`).join("")||'<div style="color:var(--muted);text-align:center;padding:24px">No cashiers</div>');
+  document.querySelectorAll("[data-ue]").forEach(b=>b.onclick=()=>{
+    const u=users[b.getAttribute("data-ue")];if(!u)return;
+    editUserId=u.id;
+    document.getElementById("eu-name").value=u.name||"";
+    document.getElementById("eu-user").value=u.username||"";
+    document.getElementById("eu-pass").value=u.password||"";
+    document.getElementById("eu-disc").value=u.discountLimit??5;
+    document.getElementById("eu-act").checked=u.active!==false;
+    document.getElementById("md-u").classList.add("on");
+  });
+}
+document.getElementById("eu-close").onclick=()=>document.getElementById("md-u").classList.remove("on");
+document.getElementById("eu-save").onclick=async()=>{
+  if(!editUserId)return;
+  try{
+    await db.ref("users/"+editUserId).update({
+      name:(document.getElementById("eu-name").value||"").trim(),
+      username:(document.getElementById("eu-user").value||"").trim().toLowerCase(),
+      password:document.getElementById("eu-pass").value||"",
+      discountLimit:Number(document.getElementById("eu-disc").value)||0,
+      active:document.getElementById("eu-act").checked,
+      updatedAt:Date.now()
+    });
+    toast("Cashier updated");
+    document.getElementById("md-u").classList.remove("on");
+  }catch(e){toast("Save failed")}
+};
+
+// REPORTS
+document.querySelectorAll("[data-rtype]").forEach(el=>el.onclick=()=>openReport(el.getAttribute("data-rtype")));
+document.getElementById("rpt-back").onclick=()=>{document.getElementById("rpt-menu").style.display="block";document.getElementById("rpt-run").style.display="none"};
+function openReport(type){
+  document.getElementById("rpt-menu").style.display="none";
+  document.getElementById("rpt-run").style.display="block";
+  document.getElementById("rpt-preview").style.display="none";
+  const titles={daily:"Daily Report",monthly:"Monthly Report",purchase:"Purchasing Report",cashiers:"Cashier Report"};
+  document.getElementById("rpt-run-title").textContent=titles[type]||"Report";
+  document.getElementById("rpt-run").setAttribute("data-type",type);
+  const fields=document.getElementById("rpt-fields");
+  if(type==="daily"||type==="purchase"||type==="cashiers"){
+    fields.innerHTML=`<div class="field"><label>Date</label><input id="rpt-d1" type="date" value="${today()}"></div>`;
+  } else if(type==="monthly"){
+    const m=today().slice(0,7);
+    fields.innerHTML=`<div class="field"><label>Month</label><input id="rpt-m1" type="month" value="${m}"></div>`;
+  }
+}
+document.getElementById("rpt-go").onclick=function(){
+  const type=document.getElementById("rpt-run").getAttribute("data-type");
+  let html="", title="";
+  if(type==="daily"){
+    const d=document.getElementById("rpt-d1").value||today();
+    title="Daily Report · "+d;
+    let sale=0,n=0,cash=0,bank=0,credit=0;
+    const rows=[];
+    Object.values(bills).forEach(b=>{if(b.cancelled)return;if(billDate(b)!==d)return;n++;sale+=Number(b.grandTotal||0);const pm=String(b.paymentMethod||"cash").toLowerCase();if(pm==="bank")bank+=Number(b.paid||0);else if(pm==="credit")credit+=Number(b.balance||0);else cash+=Number(b.paid||0);rows.push(b)});
+    html=`<p><b>Bills:</b> ${n} · <b>Sale:</b> ${money(sale)}</p><p>Cash ${money(cash)} · Bank ${money(bank)} · Udhaar ${money(credit)}</p>`+rows.map(b=>`<div>${b.billNo} · ${b.customerName||""} · ${money(b.grandTotal)} · ${b.paymentMethod||""}</div>`).join("");
+  } else if(type==="monthly"){
+    const m=document.getElementById("rpt-m1").value||today().slice(0,7);
+    title="Monthly Report · "+m;
+    let sale=0,n=0;
+    Object.values(bills).forEach(b=>{if(b.cancelled)return;if(!String(billDate(b)).startsWith(m))return;n++;sale+=Number(b.grandTotal||0)});
+    html=`<p><b>Month:</b> ${m}</p><p><b>Bills:</b> ${n}</p><p><b>Total sale:</b> ${money(sale)}</p>`;
+  } else if(type==="purchase"){
+    const d=document.getElementById("rpt-d1").value||today();
+    title="Purchase Report · "+d;
+    let total=0,n=0;const rows=[];
+    Object.values(purchases).forEach(p=>{if(p.date!==d)return;n++;total+=Number(p.total||0);rows.push(p)});
+    html=`<p><b>Bills:</b> ${n} · <b>Cost:</b> ${money(total)}</p>`+rows.map(p=>`<div>${p.purchaseNo||""} · ${p.supplier||""} · ${money(p.total)}</div>`).join("");
+  } else if(type==="cashiers"){
+    const d=document.getElementById("rpt-d1").value||today();
+    title="Cashier Report · "+d;
+    const by={};
+    Object.values(bills).forEach(b=>{if(b.cancelled)return;if(billDate(b)!==d)return;const n=b.cashierName||"Unknown";if(!by[n])by[n]={c:0,s:0};by[n].c++;by[n].s+=Number(b.grandTotal||0)});
+    html=Object.keys(by).map(n=>`<div><b>${n}</b> · ${by[n].c} bills · ${money(by[n].s)}</div>`).join("")||"<p>No sales</p>";
+  }
+  const prev=document.getElementById("rpt-preview");
+  prev.style.display="block";
+  prev.innerHTML=`<div style="font-weight:900;margin-bottom:8px">${title}</div>${html}<button type="button" class="btn btn-pri" style="width:100%;margin-top:12px" id="rpt-print">Print</button>`;
+  document.getElementById("rpt-print").onclick=()=>{
+    const w=window.open("","_blank");
+    w.document.write(`<html><head><title>${title}</title></head><body style="font-family:Arial;padding:16px"><h2>${title}</h2>${html}<script>window.print()<\/script></body></html>`);
+    w.document.close();
+  };
+};
+
+// CHANGELOGS
+document.querySelectorAll(".tb [data-cmd]").forEach(btn=>btn.onclick=()=>{document.execCommand(btn.getAttribute("data-cmd"),false,null);document.getElementById("log-body").focus()});
+document.querySelectorAll(".tb [data-fore]").forEach(btn=>btn.onclick=()=>{document.execCommand("foreColor",false,btn.getAttribute("data-fore"));document.getElementById("log-body").focus()});
+document.getElementById("log-send").onclick=async()=>{
+  const title=(document.getElementById("log-title").value||"").trim();
+  const body=document.getElementById("log-body").innerHTML.trim();
+  if(!title||!body||body==="<br>"){toast("Title + content required");return}
+  try{
+    const r=db.ref("changelogs").push();
+    await r.set({title,body,ts:Date.now(),by:currentIdentity.name||"Developer"});
+    document.getElementById("log-title").value="";
+    document.getElementById("log-body").innerHTML="";
+    toast("Changelog sent to users");
+  }catch(e){toast("Send failed")}
+};
+function renderLogList(){
+  const list=Object.values(changelogs).sort((a,b)=>(b.ts||0)-(a.ts||0));
+  document.getElementById("log-list").innerHTML=list.length?list.map(l=>`<div class="row"><div style="font-weight:900">${escapeHtml(l.title)}</div><div style="font-size:11px;color:var(--muted);margin:4px 0">${l.ts?new Date(l.ts).toLocaleString():""} · ${escapeHtml(l.by||"")}</div><div style="font-size:13px;line-height:1.5">${l.body||""}</div></div>`).join(""):'<div style="color:var(--muted);text-align:center;padding:16px">No changelogs yet</div>';
+}
+
+// CHAT + IDENTITY
+function showChatList(){document.getElementById("chat-list-view").style.display="block";document.getElementById("chat-room-view").style.display="none";activeChatId=null}
+function renderChatList(){
+  const list=Object.values(chats).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+  document.getElementById("chatlist").innerHTML=list.length?list.map(c=>{
+    const open=c.status==="open";
+    return `<div class="row"><div style="display:flex;justify-content:space-between;gap:8px"><div style="flex:1;cursor:pointer" data-cid="${c.id}"><div style="display:flex;justify-content:space-between"><b>${escapeHtml(c.userName||"Cashier")}</b><span class="chip" style="background:${open?"rgba(52,211,153,.15)":"rgba(148,163,184,.15)"};color:${open?"#34d399":"#94a3b8"}">${open?"OPEN":"CLOSED"}</span></div><div style="font-size:11px;color:var(--muted);margin-top:4px">${escapeHtml(c.issueType||"")} · ${(c.lastMessage||"").slice(0,50)}</div></div><button type="button" class="btn btn-ghost btn-sm" style="color:var(--bad)" data-cdel="${c.id}"><i class="fa-solid fa-trash"></i></button></div></div>`;
+  }).join(""):'<div style="color:var(--muted);text-align:center;padding:24px">No chats</div>';
+  document.querySelectorAll("[data-cid]").forEach(el=>el.onclick=()=>requestOpenChat(el.getAttribute("data-cid")));
+  document.querySelectorAll("[data-cdel]").forEach(btn=>btn.onclick=async e=>{e.stopPropagation();if(!confirm("Delete chat?"))return;try{await db.ref("support_chats/"+btn.getAttribute("data-cdel")).remove();toast("Deleted")}catch(err){toast("Failed")}});
+}
+function requestOpenChat(id){
+  pendingChatId=id;
+  // If identity already chosen this session, open directly
+  if(currentIdentity && currentIdentity.name && currentIdentity.name!=="Developer"){
+    openChat(id);
+    return;
+  }
+  // show identity picker
+  const list=Object.values(identities);
+  document.getElementById("id-pick-list").innerHTML=list.length?list.map(i=>`<div class="row" style="cursor:pointer;display:flex;gap:10px;align-items:center" data-pick="${i.id}"><div class="avatar-frame" style="width:40px;height:40px;border-radius:12px"><img src="${i.avatar||("https://ui-avatars.com/api/?name="+encodeURIComponent(i.name||"D")+"&background=0891b2&color=fff&size=80")}"></div><b>${escapeHtml(i.name)}</b></div>`).join("")+'<div style="font-size:11px;color:var(--muted);margin:8px 0">Or create new below</div>':'<div style="font-size:11px;color:var(--muted);margin-bottom:8px">No saved IDs — create new</div>';
+  document.querySelectorAll("[data-pick]").forEach(el=>el.onclick=()=>{
+    const idn=identities[el.getAttribute("data-pick")];
+    currentIdentity={name:idn.name,avatar:idn.avatar||"",id:idn.id};
+    localStorage.setItem("wt_dev_identity",JSON.stringify(currentIdentity));
+    applyHdr();
+    document.getElementById("md-id").classList.remove("on");
+    openChat(pendingChatId);
+  });
+  document.getElementById("id-name").value=currentIdentity.name||"";
+  document.getElementById("id-prev").src=currentIdentity.avatar||("https://ui-avatars.com/api/?name="+encodeURIComponent(currentIdentity.name||"Dev")+"&background=0891b2&color=fff&size=96");
+  document.getElementById("md-id").classList.add("on");
+}
+let pendingDp=null;
+document.getElementById("id-file").onchange=function(){
+  const f=this.files&&this.files[0];if(!f)return;
+  if(f.size>700000){toast("Image max ~700KB");this.value="";return}
+  const r=new FileReader();r.onload=()=>{pendingDp=r.result;document.getElementById("id-prev").src=pendingDp};r.readAsDataURL(f);this.value="";
+};
+document.getElementById("id-cancel").onclick=()=>{document.getElementById("md-id").classList.remove("on");pendingChatId=null};
+document.getElementById("id-save").onclick=async()=>{
+  const name=(document.getElementById("id-name").value||"").trim();
+  if(!name){toast("Name required");return}
+  const avatar=pendingDp||currentIdentity.avatar||"";
+  try{
+    const r=db.ref("dev_identities").push();
+    await r.set({name,avatar,ts:Date.now()});
+    currentIdentity={name,avatar,id:r.key};
+    localStorage.setItem("wt_dev_identity",JSON.stringify(currentIdentity));
+    applyHdr();
+    pendingDp=null;
+    document.getElementById("md-id").classList.remove("on");
+    if(pendingChatId)openChat(pendingChatId);
+    toast("Identity saved");
+  }catch(e){toast("Save failed")}
+};
+document.getElementById("id-new").onclick=()=>{pendingChatId=null;document.getElementById("id-name").value="";pendingDp=null;document.getElementById("id-prev").src="https://ui-avatars.com/api/?name=New&background=0891b2&color=fff&size=96";document.getElementById("id-pick-list").innerHTML="";document.getElementById("md-id").classList.add("on")};
+
+function openChat(id){
+  activeChatId=id;
+  document.getElementById("chat-list-view").style.display="none";
+  document.getElementById("chat-room-view").style.display="flex";
+  renderChatRoom();
+}
+document.getElementById("chat-back").onclick=()=>{showChatList();renderChatList()};
+function renderChatRoom(){
+  const c=chats[activeChatId];if(!c)return;
+  document.getElementById("chat-peer-name").textContent=c.userName||"Cashier";
+  document.getElementById("chat-peer-meta").textContent=(c.issueType||"")+" · "+(c.status||"");
+  document.getElementById("chat-peer-img").src="https://ui-avatars.com/api/?name="+encodeURIComponent(c.userName||"U")+"&background=334155&color=fff&size=80";
+  document.getElementById("chat-end").style.display=c.status==="open"?"":"none";
+  const box=document.getElementById("chat-scroll");
+  box.innerHTML=(c.messages||[]).map(m=>{
+    const me=m.from==="developer";
+    return `<div class="msg-bubble ${me?"msg-me":"msg-them"}"><div style="font-size:10px;opacity:.7;margin-bottom:2px">${me?escapeHtml(m.name||currentIdentity.name||"Dev"):escapeHtml(c.userName||"User")} · ${m.ts?new Date(m.ts).toLocaleTimeString():""}</div>${m.text?`<div>${escapeHtml(m.text)}</div>`:""}${m.image?`<img class="msg-img" src="${m.image}">`:""}</div>`;
+  }).join("")||'<div style="color:var(--muted);text-align:center;padding:20px">No messages</div>';
+  box.scrollTop=box.scrollHeight;
+}
+async function sendDevMsg(text,image){
+  if(!activeChatId)return;
+  const c=chats[activeChatId];if(!c||c.status!=="open"){toast("Chat closed");return}
+  const msg={from:"developer",text:text||"",image:image||null,ts:Date.now(),name:currentIdentity.name||"Developer"};
+  await db.ref("support_chats/"+activeChatId).update({messages:(c.messages||[]).concat([msg]),lastMessage:text||"[image]",updatedAt:Date.now()});
+}
+document.getElementById("chat-send").onclick=async()=>{const inp=document.getElementById("chat-input");const t=(inp.value||"").trim();if(!t)return;inp.value="";await sendDevMsg(t,null)};
+document.getElementById("chat-input").onkeydown=e=>{if(e.key==="Enter")document.getElementById("chat-send").click()};
+document.getElementById("chat-img").onchange=async function(){const f=this.files&&this.files[0];if(!f)return;if(f.size>900000){toast("Image too large");this.value="";return}const r=new FileReader();r.onload=async()=>{await sendDevMsg("",r.result);this.value=""};r.readAsDataURL(f)};
+document.getElementById("chat-end").onclick=async()=>{if(!activeChatId||!confirm("End chat?"))return;await db.ref("support_chats/"+activeChatId).update({status:"closed",closedAt:Date.now(),updatedAt:Date.now()});toast("Closed");showChatList();renderChatList()};
+document.getElementById("chat-del").onclick=async()=>{if(!activeChatId||!confirm("Delete permanently?"))return;try{await db.ref("support_chats/"+activeChatId).remove();toast("Deleted");showChatList();renderChatList()}catch(e){toast("Failed")}};
+
+function renderIdentities(){
+  const list=Object.values(identities);
+  document.getElementById("id-list").innerHTML=list.length?list.map(i=>`<div class="row" style="display:flex;gap:10px;align-items:center"><div class="avatar-frame" style="width:40px;height:40px;border-radius:12px"><img src="${i.avatar||("https://ui-avatars.com/api/?name="+encodeURIComponent(i.name||"D")+"&background=0891b2&color=fff&size=80")}"></div><div style="flex:1"><b>${escapeHtml(i.name)}</b></div><button type="button" class="btn btn-ghost btn-sm" data-use="${i.id}">Use</button></div>`).join(""):'<div style="color:var(--muted)">No identities yet</div>';
+  document.querySelectorAll("[data-use]").forEach(b=>b.onclick=()=>{const i=identities[b.getAttribute("data-use")];currentIdentity={name:i.name,avatar:i.avatar||"",id:i.id};localStorage.setItem("wt_dev_identity",JSON.stringify(currentIdentity));applyHdr();toast("Using "+i.name)});
+}
+
+renderHome();
+})();
+</script>
+</body>
+  </html>
