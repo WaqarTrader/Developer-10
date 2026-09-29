@@ -21,6 +21,7 @@
   .btn-gold{background:linear-gradient(135deg,#f0b429,#d97706);color:#1a1204}
   .btn-ghost{background:rgba(255,255,255,.05);color:#cbd5e1;border:1px solid var(--line)}
   .btn-bad{background:rgba(248,113,113,.12);color:#f87171;border:1px solid rgba(248,113,113,.3)}
+  .btn-ok{background:rgba(52,211,153,.12);color:#34d399;border:1px solid rgba(52,211,153,.3)}
   .btn-sm{padding:7px 11px;font-size:11px;border-radius:9px}
   .stat{padding:14px;border-radius:14px;background:linear-gradient(145deg,#151e30,#0f1624);border:1px solid var(--line)}
   .stat .l{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
@@ -109,6 +110,9 @@
         <div class="rpt-item" data-rtype="monthly"><div><b>Monthly Report</b><div style="font-size:11px;color:var(--muted);margin-top:2px">Full month sales</div></div><i class="fa-solid fa-chevron-right" style="color:var(--muted)"></i></div>
         <div class="rpt-item" data-rtype="purchase"><div><b>Purchasing Report</b><div style="font-size:11px;color:var(--muted);margin-top:2px">Purchase bills by date</div></div><i class="fa-solid fa-chevron-right" style="color:var(--muted)"></i></div>
         <div class="rpt-item" data-rtype="cashiers"><div><b>Cashier Report</b><div style="font-size:11px;color:var(--muted);margin-top:2px">Performance by cashier</div></div><i class="fa-solid fa-chevron-right" style="color:var(--muted)"></i></div>
+        <div class="rpt-item" data-rtype="userdaily"><div><b>User Daily Totals</b><div style="font-size:11px;color:var(--muted);margin-top:2px">Each cashier day total</div></div><i class="fa-solid fa-chevron-right" style="color:var(--muted)"></i></div>
+        <div class="rpt-item" data-rtype="saleorders"><div><b>Sales Orders Report</b><div style="font-size:11px;color:var(--muted);margin-top:2px">Pending / complete counts</div></div><i class="fa-solid fa-chevron-right" style="color:var(--muted)"></i></div>
+        <div class="rpt-item" data-rtype="appsummary"><div><b>App Summary</b><div style="font-size:11px;color:var(--muted);margin-top:2px">Products · users · orders · bills</div></div><i class="fa-solid fa-chevron-right" style="color:var(--muted)"></i></div>
       </div>
       <div id="rpt-run" style="display:none">
         <button type="button" id="rpt-back" class="btn btn-ghost btn-sm" style="margin-bottom:10px"><i class="fa-solid fa-arrow-left"></i> Back</button>
@@ -169,6 +173,13 @@
       </div>
     </section>
 
+
+    <section id="pg-orders" class="sc">
+      <div style="font-weight:900;font-size:16px;margin-bottom:12px">Sale Orders</div>
+      <div class="field" style="margin-bottom:10px"><input id="ord-q" placeholder="Search ref / store / customer" style="text-transform:none"></div>
+      <div id="dev-ord-list"></div>
+    </section>
+
     <section id="pg-set" class="sc">
       <div style="font-weight:900;font-size:16px;margin-bottom:12px">Developer Identities</div>
       <div class="card" style="padding:14px;margin-bottom:12px">
@@ -176,15 +187,57 @@
         <div id="id-list"></div>
         <button type="button" id="id-new" class="btn btn-ghost" style="width:100%;margin-top:10px"><i class="fa-solid fa-plus"></i> New identity</button>
       </div>
+      <div style="font-weight:900;font-size:15px;margin:16px 0 10px">Cashier Login Branding</div>
+      <div class="card" style="padding:14px">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Upload images or paste URL — User login page</div>
+        <div style="font-size:10px;font-weight:800;color:var(--a2);margin-bottom:6px">BACKGROUND</div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+          <label class="btn btn-ghost btn-sm" style="cursor:pointer"><i class="fa-solid fa-upload"></i> Upload BG<input type="file" id="ps-bg-file" accept="image/*" style="display:none"></label>
+          <button type="button" id="ps-bg-clear" class="btn btn-ghost btn-sm">Clear BG</button>
+        </div>
+        <div class="field" style="margin-bottom:10px"><label style="font-size:10px;color:var(--muted);font-weight:800">Or BG URL</label><input id="ps-bg" placeholder="https://..." style="text-transform:none"></div>
+        <div id="ps-bg-prev" style="height:80px;border-radius:10px;background:#0f172a center/cover no-repeat;margin-bottom:12px;border:1px solid var(--line)"></div>
+        <div style="font-size:10px;font-weight:800;color:var(--a2);margin-bottom:6px">LOGO</div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center;flex-wrap:wrap">
+          <label class="btn btn-ghost btn-sm" style="cursor:pointer"><i class="fa-solid fa-upload"></i> Upload Logo<input type="file" id="ps-logo-file" accept="image/*" style="display:none"></label>
+          <button type="button" id="ps-logo-clear" class="btn btn-ghost btn-sm">Clear Logo</button>
+          <img id="ps-logo-prev" style="height:48px;max-width:80px;object-fit:contain;display:none;border-radius:8px;background:#0f172a">
+        </div>
+        <div class="field" style="margin-bottom:10px"><label style="font-size:10px;color:var(--muted);font-weight:800">Or Logo URL</label><input id="ps-logo" placeholder="https://..." style="text-transform:none"></div>
+        <button type="button" id="ps-save" class="btn btn-pri" style="width:100%">Save Login Design</button>
+      </div>
+
+      <div style="font-weight:900;font-size:15px;margin:16px 0 10px">Software Key (3-month)</div>
+      <div class="card" style="padding:14px;margin-bottom:12px">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px">User login requires this key. Generate new key each quarter — share with shop.</div>
+        <div style="font-size:20px;font-weight:900;color:var(--gold);letter-spacing:.12em;margin-bottom:10px" id="sk-display">—</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Quarter: <span id="sk-quarter">—</span></div>
+        <button type="button" id="sk-gen" class="btn btn-pri" style="width:100%;margin-bottom:8px">Generate New Key</button>
+        <button type="button" id="sk-clear" class="btn btn-ghost" style="width:100%">Disable Key Lock</button>
+      </div>
+
+      <div style="font-weight:900;font-size:15px;margin:16px 0 10px">Danger zone</div>
+      <div class="card" style="padding:14px;margin-bottom:12px;border-color:rgba(248,113,113,.4)">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px">Permanent actions — use carefully</div>
+        <button type="button" id="dz-wipe-bills" class="btn btn-bad" style="width:100%;margin-bottom:8px">Delete ALL vouchers / bills</button>
+        <button type="button" id="dz-reset-seq" class="btn btn-ghost" style="width:100%">Reset bill numbers (all months)</button>
+      </div>
+
+      <div style="font-weight:900;font-size:15px;margin:16px 0 10px">User access</div>
+      <div class="card" style="padding:14px">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Per cashier permissions</div>
+        <div id="perm-list"></div>
+      </div>
     </section>
   </main>
 
   <nav style="position:fixed;bottom:0;left:0;right:0;display:flex;background:rgba(11,18,32,.96);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:40;backdrop-filter:blur(12px)">
     <button class="navb on" data-p="home"><i class="fa-solid fa-gauge-high"></i>Home</button>
     <button class="navb" data-p="sales"><i class="fa-solid fa-receipt"></i>Sales</button>
+    <button class="navb" data-p="orders"><i class="fa-solid fa-clipboard-list"></i>Orders</button>
     <button class="navb" data-p="prod"><i class="fa-solid fa-box"></i>Stock</button>
-    <button class="navb" data-p="staff"><i class="fa-solid fa-key"></i>Cashiers</button>
-    <button class="navb" data-p="reports"><i class="fa-solid fa-chart-pie"></i>Reports</button>
+    <button class="navb" data-p="staff"><i class="fa-solid fa-key"></i>Staff</button>
+    <button class="navb" data-p="reports"><i class="fa-solid fa-chart-pie"></i>Rpt</button>
     <button class="navb" data-p="logs"><i class="fa-solid fa-scroll"></i>Logs</button>
     <button class="navb" data-p="chat"><i class="fa-solid fa-comments"></i>Chat</button>
     <button class="navb" data-p="set"><i class="fa-solid fa-user-gear"></i>IDs</button>
@@ -244,7 +297,7 @@ firebase.initializeApp({
   appId:"1:1014019143422:android:81752d55cf1e96a790d7af"
 });
 const db=firebase.database();
-let products={},customers={},users={},bills={},purchases={},chats={},identities={},changelogs={};
+let products={},customers={},users={},bills={},purchases={},chats={},identities={},changelogs={},saleOrders={};
 let activeChatId=null, pendingChatId=null, activeIdentity=null, editUserId=null;
 let prodCategory=null;
 let currentIdentity={name:"Developer",avatar:""};
@@ -274,6 +327,7 @@ function go(p){
   document.querySelectorAll(".navb").forEach(b=>b.classList.toggle("on",b.getAttribute("data-p")===p));
   if(p==="home")renderHome();
   if(p==="sales")renderSales();
+  if(p==="orders")renderDevOrders();
   if(p==="prod"){prodCategory=null;renderProd()}
   if(p==="staff")renderStaff();
   if(p==="reports"){document.getElementById("rpt-menu").style.display="block";document.getElementById("rpt-run").style.display="none"}
@@ -302,6 +356,7 @@ function refreshActive(){
   const p=activePage();
   if(p==="home") renderHome();
   else if(p==="sales") renderSales();
+  else if(p==="orders") renderDevOrders();
   else if(p==="prod") renderProd();
   else if(p==="staff") renderStaff();
   else if(p==="chat"){ if(activeChatId) renderChatRoom(); else renderChatList(); }
@@ -340,6 +395,7 @@ bindLive("purchases", m=>{ purchases=m; });
 bindLive("support_chats", m=>{ chats=m; });
 bindLive("dev_identities", m=>{ identities=m; });
 bindLive("changelogs", m=>{ changelogs=m; });
+bindLive("sale_orders", m=>{ saleOrders=m; });
 
 function billDate(b){if(b.date)return String(b.date).slice(0,10);if(b.ts){try{const d=new Date(b.ts);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}catch(e){}}return""}
 
@@ -466,8 +522,10 @@ function openReport(type){
   document.getElementById("rpt-run-title").textContent=titles[type]||"Report";
   document.getElementById("rpt-run").setAttribute("data-type",type);
   const fields=document.getElementById("rpt-fields");
-  if(type==="daily"||type==="purchase"||type==="cashiers"){
+  if(type==="daily"||type==="purchase"||type==="cashiers"||type==="userdaily"){
     fields.innerHTML=`<div class="field"><label>Date</label><input id="rpt-d1" type="date" value="${today()}"></div>`;
+  } else if(type==="saleorders"||type==="appsummary"){
+    fields.innerHTML=`<div style="font-size:12px;color:var(--muted)">No date needed</div>`;
   } else if(type==="monthly"){
     const m=today().slice(0,7);
     fields.innerHTML=`<div class="field"><label>Month</label><input id="rpt-m1" type="month" value="${m}"></div>`;
@@ -501,6 +559,35 @@ document.getElementById("rpt-go").onclick=function(){
     const by={};
     Object.values(bills).forEach(b=>{if(b.cancelled)return;if(billDate(b)!==d)return;const n=b.cashierName||"Unknown";if(!by[n])by[n]={c:0,s:0};by[n].c++;by[n].s+=Number(b.grandTotal||0)});
     html=Object.keys(by).map(n=>`<div><b>${n}</b> · ${by[n].c} bills · ${money(by[n].s)}</div>`).join("")||"<p>No sales</p>";
+  } else if(type==="userdaily"){
+    const d=document.getElementById("rpt-d1").value||today();
+    title="User Daily · "+d;
+    const by={};
+    Object.values(bills).forEach(b=>{
+      if(b.cancelled)return;
+      const bd=b.date||(b.ts?new Date(b.ts).toISOString().slice(0,10):"");
+      if(bd!==d)return;
+      const n=b.cashierName||"Unknown";
+      if(!by[n])by[n]={c:0,s:0};
+      by[n].c++;by[n].s+=Number(b.grandTotal||0);
+    });
+    html=Object.keys(by).map(n=>`<div><b>${n}</b> · ${by[n].c} bills · ${money(by[n].s)}</div>`).join("")||"<p>No data</p>";
+  } else if(type==="saleorders"){
+    title="Sales Orders Report";
+    let pend=0,comp=0,tot=0;
+    Object.values(saleOrders).forEach(o=>{
+      tot++;
+      if((o.status||"pending")==="completed")comp++;else pend++;
+    });
+    html=`<p><b>Total orders:</b> ${tot}</p><p><b>Pending:</b> ${pend}</p><p><b>Completed:</b> ${comp}</p>`;
+  } else if(type==="appsummary"){
+    title="App Summary";
+    html=`<p>Products: ${Object.keys(products).length}</p>
+      <p>Cashiers: ${Object.keys(users).length}</p>
+      <p>Bills: ${Object.keys(bills).length}</p>
+      <p>Sale orders: ${Object.keys(saleOrders).length}</p>
+      <p>Customers: ${Object.keys(customers).length}</p>`;
+
   }
   const prev=document.getElementById("rpt-preview");
   prev.style.display="block";
@@ -627,6 +714,233 @@ function renderIdentities(){
   document.getElementById("id-list").innerHTML=list.length?list.map(i=>`<div class="row" style="display:flex;gap:10px;align-items:center"><div class="avatar-frame" style="width:40px;height:40px;border-radius:12px"><img src="${i.avatar||("https://ui-avatars.com/api/?name="+encodeURIComponent(i.name||"D")+"&background=0891b2&color=fff&size=80")}"></div><div style="flex:1"><b>${escapeHtml(i.name)}</b></div><button type="button" class="btn btn-ghost btn-sm" data-use="${i.id}">Use</button></div>`).join(""):'<div style="color:var(--muted)">No identities yet</div>';
   document.querySelectorAll("[data-use]").forEach(b=>b.onclick=()=>{const i=identities[b.getAttribute("data-use")];currentIdentity={name:i.name,avatar:i.avatar||"",id:i.id};localStorage.setItem("wt_dev_identity",JSON.stringify(currentIdentity));applyHdr();toast("Using "+i.name)});
 }
+
+
+// ===== DEV SALE ORDERS =====
+function renderDevOrders(){
+  const q=(document.getElementById("ord-q")&&document.getElementById("ord-q").value||"").toLowerCase();
+  let list=Object.values(saleOrders).sort((a,b)=>(b.ts||0)-(a.ts||0));
+  if(q) list=list.filter(o=>[o.refNo,o.storeName,o.customerName,o.status].map(x=>String(x||"").toLowerCase()).join(" ").includes(q));
+  const box=document.getElementById("dev-ord-list");
+  if(!box) return;
+  if(!list.length){box.innerHTML='<div style="color:var(--muted);text-align:center;padding:24px">No orders</div>';return}
+  box.innerHTML=list.map(o=>{
+    const done=o.status==="completed";
+    return `<div class="row">
+      <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start">
+        <div>
+          <div style="font-weight:900;color:var(--a2)">${escapeHtml(o.refNo||"—")}</div>
+          <div style="font-size:13px;font-weight:700;margin-top:4px">${escapeHtml(o.storeName||"—")}</div>
+          <div style="font-size:12px;color:var(--muted)">${escapeHtml(o.customerName||"")}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">${o.date||""} · ${(o.items||[]).length} items · ${money(o.total)}</div>
+        </div>
+        <span class="chip" style="background:${done?"rgba(52,211,153,.15)":"rgba(240,180,41,.15)"};color:${done?"#34d399":"#f0b429"}">${done?"COMPLETED":"PENDING"}</span>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+        ${done?`<button type="button" class="btn btn-ghost btn-sm" data-repend="${o.id}">Re-Pending</button>`:""}
+        ${!done?`<button type="button" class="btn btn-ok btn-sm" data-complete="${o.id}">Complete</button>`:""}
+        <button type="button" class="btn btn-bad btn-sm" data-odel="${o.id}">Delete</button>
+      </div>
+    </div>`;
+  }).join("");
+  box.querySelectorAll("[data-repend]").forEach(b=>b.onclick=async()=>{
+    if(!confirm("Set this order back to PENDING?"))return;
+    try{await db.ref("sale_orders/"+b.getAttribute("data-repend")).update({status:"pending",reopenedAt:Date.now()});toast("Order set to Pending")}catch(e){toast("Failed")}
+  });
+  box.querySelectorAll("[data-complete]").forEach(b=>b.onclick=async()=>{
+    try{await db.ref("sale_orders/"+b.getAttribute("data-complete")).update({status:"completed",completedAt:Date.now()});toast("Completed")}catch(e){toast("Failed")}
+  });
+  box.querySelectorAll("[data-odel]").forEach(b=>b.onclick=async()=>{
+    if(!confirm("Delete this order permanently?"))return;
+    try{await db.ref("sale_orders/"+b.getAttribute("data-odel")).remove();toast("Deleted")}catch(e){toast("Failed")}
+  });
+}
+const ordQ=document.getElementById("ord-q");
+if(ordQ) ordQ.oninput=renderDevOrders;
+
+// ===== Portal branding upload =====
+function compressImage(file, maxW, quality){
+  return new Promise((resolve,reject)=>{
+    const r=new FileReader();
+    r.onload=()=>{
+      const img=new Image();
+      img.onload=()=>{
+        let w=img.width,h=img.height;
+        if(w>maxW){h=Math.round(h*maxW/w);w=maxW}
+        const c=document.createElement("canvas");
+        c.width=w;c.height=h;
+        c.getContext("2d").drawImage(img,0,0,w,h);
+        resolve(c.toDataURL("image/jpeg", quality));
+      };
+      img.onerror=reject;
+      img.src=r.result;
+    };
+    r.onerror=reject;
+    r.readAsDataURL(file);
+  });
+}
+function previewPortal(){
+  const bg=(document.getElementById("ps-bg").value||"").trim();
+  const lg=(document.getElementById("ps-logo").value||"").trim();
+  const bp=document.getElementById("ps-bg-prev");
+  const lp=document.getElementById("ps-logo-prev");
+  if(bp) bp.style.backgroundImage=bg?("url('"+bg.replace(/'/g,"%27")+"')"):"none";
+  if(lp){
+    if(lg){lp.src=lg;lp.style.display="block"}
+    else{lp.removeAttribute("src");lp.style.display="none"}
+  }
+}
+db.ref("portal_settings").on("value",s=>{
+  const v=s.exists()?(s.val()||{}):{};
+  const bg=document.getElementById("ps-bg");
+  const lg=document.getElementById("ps-logo");
+  if(bg && document.activeElement!==bg) bg.value=v.loginBg||"";
+  if(lg && document.activeElement!==lg) lg.value=v.loginLogo||"";
+  previewPortal();
+});
+document.getElementById("ps-bg").oninput=previewPortal;
+document.getElementById("ps-logo").oninput=previewPortal;
+document.getElementById("ps-bg-file").onchange=async function(){
+  const f=this.files&&this.files[0]; if(!f) return;
+  try{
+    toast("Compressing…");
+    const data=await compressImage(f, 1400, 0.72);
+    if(data.length>900000){toast("Image still large — try smaller photo");this.value="";return}
+    document.getElementById("ps-bg").value=data;
+    previewPortal();
+    toast("Background ready — tap Save");
+  }catch(e){toast("Upload failed")}
+  this.value="";
+};
+document.getElementById("ps-logo-file").onchange=async function(){
+  const f=this.files&&this.files[0]; if(!f) return;
+  try{
+    const data=await compressImage(f, 400, 0.85);
+    if(data.length>400000){toast("Logo too large");this.value="";return}
+    document.getElementById("ps-logo").value=data;
+    previewPortal();
+    toast("Logo ready — tap Save");
+  }catch(e){toast("Upload failed")}
+  this.value="";
+};
+document.getElementById("ps-bg-clear").onclick=()=>{document.getElementById("ps-bg").value="";previewPortal()};
+document.getElementById("ps-logo-clear").onclick=()=>{document.getElementById("ps-logo").value="";previewPortal()};
+document.getElementById("ps-save").onclick=async()=>{
+  const loginBg=(document.getElementById("ps-bg").value||"").trim();
+  const loginLogo=(document.getElementById("ps-logo").value||"").trim();
+  try{
+    await db.ref("portal_settings").update({loginBg,loginLogo,updatedAt:Date.now()});
+    toast("Login design saved");
+  }catch(e){
+    console.error(e);
+    toast("Save failed — image may be too large for Firebase");
+  }
+};
+
+
+// Software key management
+function genKey() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let k = "";
+  for (let i = 0; i < 12; i++) {
+    if (i && i % 4 === 0) k += "-";
+    k += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return k;
+}
+function currentQuarter() {
+  const d = new Date();
+  return d.getFullYear() + "-Q" + (Math.floor(d.getMonth() / 3) + 1);
+}
+db.ref("software_license").on("value", s => {
+  const v = s.exists() ? (s.val() || {}) : {};
+  const el = document.getElementById("sk-display");
+  const q = document.getElementById("sk-quarter");
+  if (el) el.textContent = v.key || "(no key — lock off)";
+  if (q) q.textContent = v.quarter || "—";
+});
+document.getElementById("sk-gen").onclick = async () => {
+  if (!confirm("Generate NEW key? Old key will stop working on cashier login.")) return;
+  const key = genKey();
+  const quarter = currentQuarter();
+  try {
+    await db.ref("software_license").set({ key, quarter, generatedAt: Date.now() });
+    toast("New key: " + key);
+  } catch (e) { toast("Failed"); }
+};
+document.getElementById("sk-clear").onclick = async () => {
+  if (!confirm("Disable software key lock?")) return;
+  try {
+    await db.ref("software_license").set({ key: "", quarter: "", generatedAt: Date.now() });
+    toast("Key lock disabled");
+  } catch (e) { toast("Failed"); }
+};
+
+// Danger zone
+document.getElementById("dz-wipe-bills").onclick = async () => {
+  if (!confirm("DELETE ALL BILLS permanently? This cannot be undone.")) return;
+  if (!confirm("Type-level confirm: really wipe all vouchers?")) return;
+  try {
+    await db.ref("bills").remove();
+    toast("All bills deleted");
+  } catch (e) { toast("Delete failed"); }
+};
+document.getElementById("dz-reset-seq").onclick = async () => {
+  if (!confirm("Reset all monthly bill counters to 0?")) return;
+  try {
+    await db.ref("meta/billCounters").remove();
+    await db.ref("meta/lastBillNo").set(1000);
+    toast("Bill numbers reset");
+  } catch (e) { toast("Reset failed"); }
+};
+
+// User permissions UI
+function renderPermList() {
+  const box = document.getElementById("perm-list");
+  if (!box) return;
+  const list = Object.values(users).filter(u => (u.role || "user") !== "admin");
+  const flags = [
+    ["reports", "Reports"],
+    ["salesOrders", "Sales Orders"],
+    ["summary", "Summary"],
+    ["purchase", "Purchase view"],
+    ["bills", "Bills"],
+    ["products", "Products"]
+  ];
+  if (!list.length) { box.innerHTML = '<div style="color:var(--muted)">No cashiers</div>'; return; }
+  box.innerHTML = list.map(u => {
+    const p = u.permissions || {};
+    return `<div class="row">
+      <div style="font-weight:800;margin-bottom:8px">${escapeHtml(u.name || u.username)}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        ${flags.map(([k, lab]) => {
+          const on = p[k] !== false; // default allow
+          return `<label style="font-size:11px;display:flex;align-items:center;gap:4px;cursor:pointer">
+            <input type="checkbox" data-uid="${u.id}" data-perm="${k}" ${on ? "checked" : ""}> ${lab}
+          </label>`;
+        }).join("")}
+      </div>
+    </div>`;
+  }).join("");
+  box.querySelectorAll("[data-perm]").forEach(cb => {
+    cb.onchange = async () => {
+      const uid = cb.getAttribute("data-uid");
+      const key = cb.getAttribute("data-perm");
+      const path = "users/" + uid + "/permissions/" + key;
+      try {
+        await db.ref(path).set(!!cb.checked);
+        toast("Permission saved");
+      } catch (e) { toast("Failed"); }
+    };
+  });
+}
+const _ri = renderIdentities;
+renderIdentities = function () {
+  _ri();
+  renderPermList();
+};
+
+// Extra report types in openReport - patch generate
 
 renderHome();
 })();
