@@ -55,18 +55,37 @@
   #log-body{min-height:120px;background:var(--elev);border:1px solid var(--line);border-radius:12px;padding:12px;outline:none;font-size:14px;line-height:1.5}
   .rpt-item{display:flex;align-items:center;justify-content:space-between;padding:14px 12px;border-radius:12px;border:1px solid var(--line);background:var(--elev);margin-bottom:8px;cursor:pointer}
   .rpt-item:active{opacity:.85}
+  .menu-dd-item{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:11px 12px;border:none;background:transparent;color:var(--text);font-size:13px;font-weight:700;border-radius:8px;cursor:pointer}
+  .menu-dd-item i{width:18px;color:var(--a2);text-align:center}
+  .menu-dd-item:hover,.menu-dd-item:active{background:rgba(34,211,238,.1)}
+  .menu-dd-item.on{background:rgba(34,211,238,.15);color:var(--a2)}
 </style>
 </head>
 <body>
 <div id="toast" class="toast"></div>
 
-<div id="sc-app" style="padding-bottom:72px;min-height:100dvh">
-  <header style="position:sticky;top:0;z-index:40;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;background:rgba(11,18,32,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)">
+<div id="sc-app" style="padding-bottom:24px;min-height:100dvh">
+  <header style="position:sticky;top:0;z-index:50;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;background:rgba(11,18,32,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)">
     <div style="display:flex;align-items:center;gap:10px">
       <div class="avatar-frame" id="dev-avatar-hdr"><img id="dev-avatar-img" src="https://ui-avatars.com/api/?name=Dev&background=0891b2&color=fff&size=112" alt="Dev"></div>
       <div>
         <div style="font-weight:900;font-size:15px">Developer Panel</div>
         <div style="font-size:10px;color:var(--muted)"><span id="hdr-dev-name">Developer</span> · Waqar Trader · <span id="conn" style="color:var(--ok)">Online</span></div>
+      </div>
+    </div>
+    <div style="position:relative">
+      <button type="button" id="dev-menu-btn" class="btn btn-ghost btn-sm" style="font-size:18px;padding:6px 12px" title="Menu">⋮</button>
+      <div id="dev-menu-dd" style="display:none;position:absolute;right:0;top:100%;margin-top:6px;min-width:200px;background:var(--elev);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.45);z-index:60;padding:6px;max-height:70vh;overflow-y:auto">
+        <button type="button" class="menu-dd-item" data-p="home"><i class="fa-solid fa-gauge-high"></i> Home</button>
+        <button type="button" class="menu-dd-item" data-p="sales"><i class="fa-solid fa-receipt"></i> Sales</button>
+        <button type="button" class="menu-dd-item" data-p="orders"><i class="fa-solid fa-clipboard-list"></i> Orders</button>
+        <button type="button" class="menu-dd-item" data-p="prod"><i class="fa-solid fa-box"></i> Stock</button>
+        <button type="button" class="menu-dd-item" data-p="staff"><i class="fa-solid fa-users"></i> Staff & Customers</button>
+        <button type="button" class="menu-dd-item" data-p="reports"><i class="fa-solid fa-chart-pie"></i> Reports</button>
+        <button type="button" class="menu-dd-item" data-p="logs"><i class="fa-solid fa-scroll"></i> Change Logs</button>
+        <button type="button" class="menu-dd-item" data-p="chat"><i class="fa-solid fa-comments"></i> Chat</button>
+        <button type="button" class="menu-dd-item" data-p="set"><i class="fa-solid fa-user-gear"></i> IDs & Access</button>
+        <button type="button" class="menu-dd-item" data-p="tools"><i class="fa-solid fa-screwdriver-wrench"></i> Tools</button>
       </div>
     </div>
   </header>
@@ -254,19 +273,38 @@
         <div id="perm-list"></div>
       </div>
     </section>
-  </main>
 
-  <nav style="position:fixed;bottom:0;left:0;right:0;display:flex;background:rgba(11,18,32,.96);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:40;backdrop-filter:blur(12px)">
-    <button class="navb on" data-p="home"><i class="fa-solid fa-gauge-high"></i>Home</button>
-    <button class="navb" data-p="sales"><i class="fa-solid fa-receipt"></i>Sales</button>
-    <button class="navb" data-p="orders"><i class="fa-solid fa-clipboard-list"></i>Orders</button>
-    <button class="navb" data-p="prod"><i class="fa-solid fa-box"></i>Stock</button>
-    <button class="navb" data-p="staff"><i class="fa-solid fa-key"></i>Staff</button>
-    <button class="navb" data-p="reports"><i class="fa-solid fa-chart-pie"></i>Rpt</button>
-    <button class="navb" data-p="logs"><i class="fa-solid fa-scroll"></i>Logs</button>
-    <button class="navb" data-p="chat"><i class="fa-solid fa-comments"></i>Chat</button>
-    <button class="navb" data-p="set"><i class="fa-solid fa-user-gear"></i>IDs</button>
-  </nav>
+    <section id="pg-tools" class="sc">
+      <div style="font-weight:900;font-size:16px;margin-bottom:12px">Developer Tools</div>
+      <div class="card" style="padding:14px;margin-bottom:12px">
+        <div style="font-size:10px;font-weight:800;color:var(--a2);margin-bottom:8px">MAINTENANCE MODE</div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+          <input type="checkbox" id="tool-maint"> Show maintenance message on User login
+        </label>
+        <input id="tool-maint-msg" placeholder="System under maintenance…" style="margin-top:8px;text-transform:none">
+        <button type="button" id="tool-maint-save" class="btn btn-pri btn-sm" style="margin-top:10px;width:100%">Save Maintenance</button>
+      </div>
+      <div class="card" style="padding:14px;margin-bottom:12px">
+        <div style="font-size:10px;font-weight:800;color:var(--gold);margin-bottom:8px">FORCE LOGOUT</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px">Kick a cashier session (next action logs them out)</div>
+        <div id="tool-force-list"></div>
+      </div>
+      <div class="card" style="padding:14px;margin-bottom:12px">
+        <div style="font-size:10px;font-weight:800;color:var(--a2);margin-bottom:8px">BACKUP</div>
+        <button type="button" id="tool-backup" class="btn btn-pri" style="width:100%"><i class="fa-solid fa-download"></i> Download JSON Backup</button>
+      </div>
+      <div class="card" style="padding:14px;margin-bottom:12px">
+        <div style="font-size:10px;font-weight:800;color:var(--gold);margin-bottom:8px">ACTIVITY LOG</div>
+        <div id="tool-act-log" style="font-size:12px;max-height:240px;overflow-y:auto;color:var(--muted)">Loading…</div>
+      </div>
+      <div class="card" style="padding:14px">
+        <div style="font-size:10px;font-weight:800;color:var(--a2);margin-bottom:8px">APP VERSION</div>
+        <input id="tool-app-ver" placeholder="e.g. 3.0" style="text-transform:none">
+        <button type="button" id="tool-ver-save" class="btn btn-ghost btn-sm" style="margin-top:8px;width:100%">Save Version Flag</button>
+      </div>
+    </section>
+
+  </main>
 </div>
 
 <!-- VOUCHER VIEW -->
@@ -364,18 +402,36 @@ applyHdr();
 function go(p){
   document.querySelectorAll(".sc").forEach(x=>x.classList.remove("on"));
   document.getElementById("pg-"+p).classList.add("on");
-  document.querySelectorAll(".navb").forEach(b=>b.classList.toggle("on",b.getAttribute("data-p")===p));
+  document.querySelectorAll(".menu-dd-item").forEach(b=>b.classList.toggle("on",b.getAttribute("data-p")===p));
   if(p==="home")renderHome();
   if(p==="sales")renderSales();
   if(p==="orders")renderDevOrders();
   if(p==="prod"){prodCategory=null;renderProd()}
-  if(p==="staff")renderStaff();
+  if(p==="staff"){renderStaff();renderDevCustomers();}
   if(p==="reports"){document.getElementById("rpt-menu").style.display="block";document.getElementById("rpt-run").style.display="none"}
   if(p==="logs")renderLogList();
   if(p==="chat"){showChatList();renderChatList()}
   if(p==="set")renderIdentities();
+  if(p==="tools")renderTools();
 }
-document.querySelectorAll(".navb").forEach(b=>b.onclick=()=>go(b.getAttribute("data-p")));
+
+(function(){
+  const btn=document.getElementById("dev-menu-btn");
+  const dd=document.getElementById("dev-menu-dd");
+  if(btn&&dd){
+    btn.onclick=e=>{e.stopPropagation();dd.style.display=dd.style.display==="none"||!dd.style.display?"block":"none"};
+    document.addEventListener("click",()=>{dd.style.display="none"});
+    dd.onclick=e=>e.stopPropagation();
+  }
+  document.querySelectorAll(".menu-dd-item").forEach(b=>{
+    b.onclick=()=>{
+      go(b.getAttribute("data-p"));
+      if(dd) dd.style.display="none";
+      document.querySelectorAll(".menu-dd-item").forEach(x=>x.classList.toggle("on",x===b));
+    };
+  });
+})();
+
 
 function snapToMap(snap){
   const m={};
@@ -402,6 +458,7 @@ function refreshActive(){
   else if(p==="chat"){ if(activeChatId) renderChatRoom(); else renderChatList(); }
   else if(p==="logs") renderLogList();
   else if(p==="set") renderIdentities();
+  else if(p==="tools") renderTools();
   else if(p==="reports") { /* keep current report view */ }
 }
 
@@ -1148,6 +1205,82 @@ renderIdentities = function () {
   _ri();
   renderPermList();
 };
+
+function renderTools(){
+  // force logout list
+  const box=document.getElementById("tool-force-list");
+  if(box){
+    const list=Object.values(users).filter(u=>(u.role||"user")!=="admin");
+    box.innerHTML=list.length?list.map(u=>`<div class="row" style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+      <div><b>${escapeHtml(u.name||u.username)}</b><div style="font-size:11px;color:var(--muted)">${escapeHtml(u.username||"")}</div></div>
+      <button type="button" class="btn btn-bad btn-sm" data-fl="${u.id}">Force Logout</button>
+    </div>`).join(""):'<div style="color:var(--muted)">No cashiers</div>';
+    box.querySelectorAll("[data-fl]").forEach(b=>{
+      b.onclick=async()=>{
+        try{
+          await db.ref("users/"+b.getAttribute("data-fl")+"/forceLogout").set(Date.now());
+          await db.ref("activity_logs").push({type:"force_logout",userId:b.getAttribute("data-fl"),ts:Date.now()});
+          toast("Force logout set");
+        }catch(e){toast("Failed")}
+      };
+    });
+  }
+  // activity
+  const al=document.getElementById("tool-act-log");
+  if(al){
+    db.ref("activity_logs").limitToLast(40).once("value").then(snap=>{
+      const rows=[];
+      if(snap.exists()) snap.forEach(c=>rows.push(Object.assign({id:c.key},c.val())));
+      rows.sort((a,b)=>(b.ts||0)-(a.ts||0));
+      al.innerHTML=rows.length?rows.map(r=>`<div style="padding:6px 0;border-bottom:1px solid var(--line)">${new Date(r.ts||0).toLocaleString()} · <b>${escapeHtml(r.type||"")}</b> ${escapeHtml(r.detail||r.userId||"")}</div>`).join(""):'No activity yet';
+    }).catch(()=>{al.textContent="Could not load"});
+  }
+  // load maint
+  db.ref("portal_settings").once("value").then(s=>{
+    const v=s.exists()?(s.val()||{}):{};
+    const cb=document.getElementById("tool-maint");
+    const msg=document.getElementById("tool-maint-msg");
+    const ver=document.getElementById("tool-app-ver");
+    if(cb) cb.checked=!!v.maintenance;
+    if(msg) msg.value=v.maintenanceMsg||"";
+    if(ver) ver.value=v.appVersion||"3.0";
+  });
+}
+document.getElementById("tool-maint-save")&&(document.getElementById("tool-maint-save").onclick=async()=>{
+  try{
+    await db.ref("portal_settings").update({
+      maintenance:!!document.getElementById("tool-maint").checked,
+      maintenanceMsg:(document.getElementById("tool-maint-msg").value||"").trim(),
+      updatedAt:Date.now()
+    });
+    toast("Maintenance saved");
+  }catch(e){toast("Failed")}
+});
+document.getElementById("tool-ver-save")&&(document.getElementById("tool-ver-save").onclick=async()=>{
+  try{
+    await db.ref("portal_settings").update({appVersion:(document.getElementById("tool-app-ver").value||"").trim(),updatedAt:Date.now()});
+    toast("Version saved");
+  }catch(e){toast("Failed")}
+});
+document.getElementById("tool-backup")&&(document.getElementById("tool-backup").onclick=async()=>{
+  try{
+    toast("Building backup…");
+    const paths=["products","customers","users","bills","purchases","sale_orders","expenses","portal_settings"];
+    const data={exportedAt:Date.now(),app:"WaqarTrader"};
+    for(const path of paths){
+      const s=await db.ref(path).once("value");
+      data[path]=s.exists()?s.val():null;
+    }
+    const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download="WAQAR_TRADER_backup_"+new Date().toISOString().slice(0,10)+".json";
+    a.click();
+    URL.revokeObjectURL(a.href);
+    toast("Backup downloaded");
+  }catch(e){console.error(e);toast("Backup failed")}
+});
+
 
 // Extra report types in openReport - patch generate
 
